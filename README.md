@@ -1,5 +1,5 @@
 # BubblyTextOverlay
 For use in OBS. URL Format below.\
 ```
-https:
+https://potatogamer.uk/BubblyTextOverlay/?text=my text here
 ```
