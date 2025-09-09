@@ -27,8 +27,8 @@
             font-size: 80px; 
             display: flex;
             flex-wrap: wrap;
-            justify-content: left; 
-            align-items: top;
+            justify-content: flex-start; /* Corrected from 'left' */
+            align-items: flex-start;   /* Corrected from 'top' */
             text-align: left;
             margin-left: 0;
             padding-left: 0;
@@ -63,11 +63,10 @@
         const staggerDelay = parseFloat(urlParams.get('stagger') || '0.05');
         const bounceHeight = urlParams.get('bounce') || '-40'; // percentage
         
-        // --- NEW: Calculate dynamic top padding ---
-        // We take the absolute value of bounceHeight (e.g., -40 becomes 40)
-        // Then we calculate that percentage of the font size to get a pixel value
+        // --- UPDATED: Calculate dynamic top padding with a line-height buffer ---
+        const lineHeightMultiplier = 1.2; // Adds a 20% buffer for line-height
         const bounceHeightPercent = Math.abs(parseFloat(bounceHeight));
-        const paddingTop = (parseFloat(fontSize) * (bounceHeightPercent / 100));
+        const paddingTop = (parseFloat(fontSize) * (bounceHeightPercent / 100)) * lineHeightMultiplier;
         document.body.style.paddingTop = `${paddingTop}px`;
         
         // --- Step 2: Apply the dynamic styles to the text container ---
@@ -122,3 +121,4 @@
     </script>
 </body>
 </html>
+
