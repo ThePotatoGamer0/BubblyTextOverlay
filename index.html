@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customizable OBS Overlay</title>
     
-    <!-- Adding Google Fonts so we can change them via URL -->
+    <!-- Adding more Google Fonts so we can change them via URL -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Montserrat:wght@400;700;900&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Lato:wght@400;700;900&family=Montserrat:wght@400;700;900&family=Oswald:wght@400;700&family=Roboto:wght@400;700;900&family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         body {
@@ -27,6 +27,9 @@
             font-size: 80px; 
             display: flex;
             flex-wrap: wrap;
+            justify-content: center; /* Center align the text */
+            align-items: center; /* Vertically align text */
+            text-align: center; /* Ensure text within spans is centered */
         }
 
         #animated-text span {
@@ -51,6 +54,7 @@
         const fontSize = urlParams.get('fontSize') || '80'; // in pixels
         const fontWeight = urlParams.get('fontWeight') || 'bold';
         const color = urlParams.get('color') || 'white';
+        const customFontUrl = urlParams.get('customFontUrl'); // New parameter for custom fonts
         
         // Animation Parameters
         const duration = parseFloat(urlParams.get('duration') || '1.5'); // in seconds
@@ -60,7 +64,24 @@
         
         // --- Step 2: Apply the dynamic styles to the text container ---
         const textContainer = document.querySelector('#animated-text');
-        textContainer.style.fontFamily = fontFamily;
+        
+        // If a custom font URL is provided, create a @font-face rule for it
+        if (customFontUrl) {
+            const style = document.createElement('style');
+            style.textContent = `
+                @font-face {
+                    font-family: 'CustomFont';
+                    src: url('${decodeURIComponent(customFontUrl)}');
+                }
+            `;
+            document.head.appendChild(style);
+            // Override the fontFamily to use our new custom font
+            textContainer.style.fontFamily = "'CustomFont', sans-serif";
+        } else {
+            // Otherwise, use the font from the URL param or the default
+            textContainer.style.fontFamily = fontFamily;
+        }
+        
         textContainer.style.fontSize = `${fontSize}px`;
         textContainer.style.fontWeight = fontWeight;
         textContainer.style.color = color;
@@ -98,3 +119,4 @@
     </script>
 </body>
 </html>
+
