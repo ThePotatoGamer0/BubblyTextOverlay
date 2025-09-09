@@ -14,22 +14,24 @@
         body {
             background-color: rgba(0, 0, 0, 0);
             margin: 0;
-            padding: 40px;
+            padding-left: 0;
+            /* A small default top padding, will be overridden by JS */
+            padding-top: 10px; 
             overflow: hidden;
-            /* Default styles that can be overridden by JS */
             font-family: 'Inter', sans-serif;
             color: white;
             text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
         }
 
         #animated-text {
-            /* Default font size, can be overridden */
             font-size: 80px; 
             display: flex;
             flex-wrap: wrap;
-            justify-content: left; /* Center align the text */
-            align-items: center; /* Vertically align text */
-            text-align: center; /* Ensure text within spans is centered */
+            justify-content: left; 
+            align-items: top;
+            text-align: left;
+            margin-left: 0;
+            padding-left: 0;
         }
 
         #animated-text span {
@@ -54,18 +56,23 @@
         const fontSize = urlParams.get('fontSize') || '80'; // in pixels
         const fontWeight = urlParams.get('fontWeight') || 'bold';
         const color = urlParams.get('color') || 'white';
-        const customFontUrl = urlParams.get('customFontUrl'); // New parameter for custom fonts
+        const customFontUrl = urlParams.get('customFontUrl');
         
         // Animation Parameters
-        const duration = parseFloat(urlParams.get('duration') || '1.5'); // in seconds
-        const staggerDelay = parseFloat(urlParams.get('stagger') || '0.05'); // in seconds
+        const duration = parseFloat(urlParams.get('duration') || '1.5');
+        const staggerDelay = parseFloat(urlParams.get('stagger') || '0.05');
         const bounceHeight = urlParams.get('bounce') || '-40'; // percentage
-
+        
+        // --- NEW: Calculate dynamic top padding ---
+        // We take the absolute value of bounceHeight (e.g., -40 becomes 40)
+        // Then we calculate that percentage of the font size to get a pixel value
+        const bounceHeightPercent = Math.abs(parseFloat(bounceHeight));
+        const paddingTop = (parseFloat(fontSize) * (bounceHeightPercent / 100));
+        document.body.style.paddingTop = `${paddingTop}px`;
         
         // --- Step 2: Apply the dynamic styles to the text container ---
         const textContainer = document.querySelector('#animated-text');
         
-        // If a custom font URL is provided, create a @font-face rule for it
         if (customFontUrl) {
             const style = document.createElement('style');
             style.textContent = `
@@ -75,10 +82,8 @@
                 }
             `;
             document.head.appendChild(style);
-            // Override the fontFamily to use our new custom font
             textContainer.style.fontFamily = "'CustomFont', sans-serif";
         } else {
-            // Otherwise, use the font from the URL param or the default
             textContainer.style.fontFamily = fontFamily;
         }
         
@@ -105,11 +110,9 @@
         animate(
             spans,
             {
-                // Keyframes are now built from a URL parameter
                 y: ["0%", `${bounceHeight}%`, "0%"]
             },
             {
-                // Animation properties are now from URL parameters
                 duration: duration,
                 delay: stagger(staggerDelay),
                 repeat: Infinity,
@@ -119,4 +122,3 @@
     </script>
 </body>
 </html>
-
