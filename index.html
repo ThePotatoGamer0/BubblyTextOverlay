@@ -3,56 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OBS Overlay</title>
+    <title>Customizable OBS Overlay</title>
     
+    <!-- Adding Google Fonts so we can change them via URL -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Montserrat:wght@400;700;900&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+
     <style>
-        /* Basic styling to make the overlay transparent and position text */
         body {
-            background-color: rgba(0, 0, 0, 0); /* Essential for transparency in OBS */
+            background-color: rgba(0, 0, 0, 0);
             margin: 0;
-            padding: 40px; /* Added more padding for bounce room */
-            font-family: 'Inter', sans-serif; /* A nice clean font */
+            padding: 40px;
+            overflow: hidden;
+            /* Default styles that can be overridden by JS */
+            font-family: 'Inter', sans-serif;
             color: white;
             text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
-            overflow: hidden; /* Prevents scrollbars during animation */
         }
 
         #animated-text {
-            font-size: 80px;
-            font-weight: bold;
-            /* Using flexbox to handle the letter spacing */
+            /* Default font size, can be overridden */
+            font-size: 80px; 
             display: flex;
             flex-wrap: wrap;
         }
 
-        /* Style for each individual letter span */
         #animated-text span {
-            display: inline-block; /* Allows transforms to be applied */
-            min-width: 0.3em; /* Ensures spaces have width */
+            display: inline-block;
+            min-width: 0.3em;
         }
     </style>
 </head>
 <body>
 
-    <!-- This div is now empty; JavaScript will fill it with text from the URL. -->
     <div id="animated-text"></div>
 
     <script type="module">
-        // Import the functions we need directly from the CDN
         import { animate, stagger } from "https://cdn.jsdelivr.net/npm/motion@latest/+esm";
 
-        // --- Step 1: Get text from the URL ---
+        // --- Step 1: Get all parameters from the URL with sensible defaults ---
         const urlParams = new URLSearchParams(window.location.search);
-        // Look for a parameter named 'text'. If it's not there, use a default.
-        const dynamicText = urlParams.get('text') || "Starting Soon";
 
-
-        // --- Step 2: Split the text into individual letter spans ---
-        const textContainer = document.querySelector('#animated-text');
-        // Set the container's text from our URL parameter
-        textContainer.textContent = dynamicText; 
+        // Text & Style Parameters
+        const text = urlParams.get('text') || "Hello World";
+        const fontFamily = urlParams.get('fontFamily') || "'Inter', sans-serif";
+        const fontSize = urlParams.get('fontSize') || '80'; // in pixels
+        const fontWeight = urlParams.get('fontWeight') || 'bold';
+        const color = urlParams.get('color') || 'white';
         
-        // Now, take that text and split it into spans for the animation
+        // Animation Parameters
+        const duration = parseFloat(urlParams.get('duration') || '1.5'); // in seconds
+        const staggerDelay = parseFloat(urlParams.get('stagger') || '0.05'); // in seconds
+        const bounceHeight = urlParams.get('bounce') || '-40'; // percentage
+
+        
+        // --- Step 2: Apply the dynamic styles to the text container ---
+        const textContainer = document.querySelector('#animated-text');
+        textContainer.style.fontFamily = fontFamily;
+        textContainer.style.fontSize = `${fontSize}px`;
+        textContainer.style.fontWeight = fontWeight;
+        textContainer.style.color = color;
+
+
+        // --- Step 3: Split the text into individual letter spans ---
+        textContainer.textContent = text; 
         const originalText = textContainer.textContent;
         textContainer.textContent = ''; 
 
@@ -63,20 +78,19 @@
         });
 
 
-        // --- Step 3: Animate the new spans with a bounce effect ---
+        // --- Step 4: Animate using the dynamic parameters ---
         const spans = document.querySelectorAll('#animated-text span');
 
         animate(
             spans,
             {
-                // Keyframes for a bounce: start at 0, go up, and back to 0
-                y: ["0%", "-40%", "0%"]
+                // Keyframes are now built from a URL parameter
+                y: ["0%", `${bounceHeight}%`, "0%"]
             },
             {
-                duration: 1.5,
-                // The stagger function creates the wave effect
-                delay: stagger(0.05),
-                // Make the animation loop forever
+                // Animation properties are now from URL parameters
+                duration: duration,
+                delay: stagger(staggerDelay),
                 repeat: Infinity,
                 easing: "ease-in-out"
             }
@@ -84,4 +98,3 @@
     </script>
 </body>
 </html>
-
